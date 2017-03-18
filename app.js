@@ -43,17 +43,20 @@ try {
     process.exit(1);
 }
 
-var RtmClient = require('@slack/client').RtmClient;
-var RTM_EVENTS = require('@slack/client').RTM_EVENTS;
-var bot_token = process.env.SLACK_API_TOKEN || '';
+//Loading routes
+process.stdout.write('Loading Slack bot....');
+try {
+    var slackBot = require('./slack/bot');
+    slackBot.listChannels();
+    slackBot.listUsers();
+    slackBot.listen()
+    process.stdout.write(colors.green('OK\n'));
+} catch (exception) {
+    console.log(exception);
+    process.stdout.write(colors.red('NOK\n'));
+    process.exit(1);
+}
 
-var rtm = new RtmClient(bot_token);
-
-rtm.on(RTM_EVENTS.MESSAGE, function handleRtmMessage(message) {
-  console.log('Message:', message); //this is no doubt the lamest possible message handler, but you get the idea
-});
-
-rtm.start();
 
 process.stdout.write(colors.yellow('Listening on port ' + config.port + '...\n'));
 server.listen(config.port);
