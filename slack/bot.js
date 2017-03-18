@@ -1,5 +1,5 @@
 module.exports = function() {
-
+    //only consider message without sub type and containing url
 }
 
 var token = process.env.SLACK_API_TOKEN || '';
@@ -24,7 +24,6 @@ module.exports.listChannels = function() {
                channels.push({id: info.channels[i].id, name: info.channels[i].name});
                _this.channelHistory(info.channels[i].id);
            }
-           console.log(channels);
        }
     });
 }
@@ -37,21 +36,32 @@ module.exports.listUsers = function() {
            for(var i in info.members) {
                users.push({id: info.members[i].id, name: info.members[i].name})
            }
-           console.log(users);
        }
     });
 }
-
+var i = 0;
 module.exports.channelHistory = function(channel) {
     web.channels.history(channel, function(err, info) {
-       console.log(info);
+        for(var i in info.messages) {
+            if (typeof info.messages[i].text == "string") {
+                var result = info.messages[i].text.match(/\<(https?:\/\/.*)\>/);
+                if (result && typeof result[1] !== "undefined") {
+                    console.log(result[1]);
+                }
+            }
+        }
     });
 }
 
 module.exports.listen = function() {
    var RTM_EVENTS = require('@slack/client').RTM_EVENTS;
    rtm.on(RTM_EVENTS.MESSAGE, function handleRtmMessage(message) {
-     console.log('Message:', message); //this is no doubt the lamest possible message handler, but you get the idea
+       if (typeof message.text == "string" && typeof message.subtype === "undefined") {
+           var result = message.text.match(/\<(https?:\/\/.*)\>/);
+           if (result && typeof result[1] !== "undefined") {
+               console.log(result[1]);
+           }
+       }
    });
 }
 
