@@ -1,11 +1,14 @@
-
 module.exports = function(app) {
+    var bodyParser = require('body-parser')
+    app.use(bodyParser.json())
+
   app.get('/', function(req, res,next) {
       res.send('Hello There');
   });
 
-  app.get('/slack', function(req, res,next) {
-
+  app.post('/slack/receive', function(req, res,next) {
+      console.log(request.body);
+      response.send(request.body.challenge);
   });
 
 }
