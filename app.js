@@ -22,6 +22,16 @@ try {
     process.exit(1);
 }
 
+//Loading routes
+process.stdout.write('Loading requests....');
+try {
+    var requests = require('./requests')(app);
+    process.stdout.write(colors.green('OK\n'));
+} catch (exception) {
+    process.stdout.write(colors.red('NOK\n'));
+    process.exit(1);
+}
+
 
 //loading http server
 process.stdout.write("Loading http server....");
