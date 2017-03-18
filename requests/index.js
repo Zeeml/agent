@@ -3,7 +3,7 @@ module.exports = function(app) {
     app.use(bodyParser.json())
 
   app.get('/', function(req, res,next) {
-      res.redirect('https://slack.com/oauth/authorize?client_id=117230330418.157030337063&scope=channels:history&redirect_uri=/success');
+      res.redirect('https://slack.com/oauth/authorize?client_id=117230330418.157030337063&scope=channels:history');
   });
 
   app.get('/success', function(req, res,next) {
