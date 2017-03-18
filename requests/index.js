@@ -3,7 +3,11 @@ module.exports = function(app) {
     app.use(bodyParser.json())
 
   app.get('/', function(req, res,next) {
-      res.send('Hello There');
+      res.redirect('https://slack.com/oauth/authorize?client_id=117230330418.157030337063&scope=channels:history&redirect_uri=/success');
+  });
+
+  app.get('/success', function(req, res,next) {
+      console.log(req);
   });
 
   app.post('/slack/receive', function(req, res,next) {
