@@ -7,8 +7,9 @@ module.exports = function(app) {
       res.send('Hello There');
   });
 
-  app.get('/slack/receive', function(req, res,next) {
-      response.send(request.body.challenge); 
+  app.post('/slack/receive', function(req, res,next) {
+      console.log(request.body);
+      response.send(request.body.challenge);
   });
 
 }
