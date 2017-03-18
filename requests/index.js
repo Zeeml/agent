@@ -8,6 +8,7 @@ module.exports = function(app) {
 
   app.post('/slack/receive', function(req, res,next) {
       console.log(req.body);
+      res.header("Content-Type",'application/x-www-form-urlencoded');
       res.send(req.body.challenge);
   });
 
