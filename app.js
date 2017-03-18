@@ -32,6 +32,7 @@ try {
     process.exit(1);
 }
 
+// loading mongodb
 
 //loading http server
 process.stdout.write("Loading http server....");

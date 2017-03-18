@@ -6,20 +6,23 @@ module.exports = function(config) {
 
   this.collection = config.database.collection
 
-  this.connect = function() {
+  this.connect = function(callback) {
     MongoClient.connect(this.uri, function(error, db) {
-      //  if (error) return funcCallback(error);
+      console.log(error,db)
+
+        return callback(error, db);
       });
 
       console.log("Connecté à la base de données '" + config.database.name + "'");
   }
 
-    this.add = function(data) {
+    this.schedule = function(data) {
         this.connect(function(err,db) {
-          db.collection(this.collection).insert(data, null, function (error, results) {
+          console.log(db)
+          db.collection('scheduled').insert(data, null, function (error, results) {
             if (error) throw error;
 
-            console.log("Le document a bien été inséré");
+            console.log("Le document a bien été inséré")
           });
       });
     }
