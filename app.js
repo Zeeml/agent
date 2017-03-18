@@ -44,10 +44,21 @@ try {
     process.exit(1);
 }
 
+process.stdout.write("Loading the mongo db....");
+try {
+    db = new (require('./database/mongo'))(require('./config'))
+    process.stdout.write(colors.green('OK\n'));
+}  catch (exception) {
+    console.log(exception);
+    process.stdout.write(colors.red('NOK\n'));
+    process.exit(1);
+}
+
 //Loading routes
 process.stdout.write('Loading Slack bot....');
 try {
     var slackBot = require('./slack/bot');
+    slackBot.setDatabase(db);
     slackBot.listChannels();
     slackBot.listUsers();
     slackBot.listen()

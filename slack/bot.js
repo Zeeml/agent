@@ -13,6 +13,11 @@ var web = new WebClient(token);
 
 var channels = [];
 var users = [];
+var database;
+
+module.exports.setDatabase = function(db) {
+    database = db;
+}
 
 module.exports.listChannels = function() {
     var _this = this;
@@ -39,13 +44,15 @@ module.exports.listUsers = function() {
        }
     });
 }
+
 var i = 0;
 module.exports.channelHistory = function(channel) {
     web.channels.history(channel, function(err, info) {
         for(var i in info.messages) {
-            if (typeof info.messages[i].text == "string") {
+            if (typeof database !== "undefined" && typeof info.messages[i].text == "string") {
                 var result = info.messages[i].text.match(/\<(https?:\/\/.*)\>/);
                 if (result && typeof result[1] !== "undefined") {
+                    database.schedule({url:result[1], user:'toto',ts: info.messages[i].ts})
                     console.log(result[1]);
                 }
             }
@@ -56,10 +63,10 @@ module.exports.channelHistory = function(channel) {
 module.exports.listen = function() {
    var RTM_EVENTS = require('@slack/client').RTM_EVENTS;
    rtm.on(RTM_EVENTS.MESSAGE, function handleRtmMessage(message) {
-       if (typeof message.text == "string" && typeof message.subtype === "undefined") {
+       if (typeof database !== "undefined" && typeof message.text == "string" && typeof message.subtype === "undefined") {
            var result = message.text.match(/\<(https?:\/\/.*)\>/);
            if (result && typeof result[1] !== "undefined") {
-               console.log(result[1]);
+               database.schedule({url:result[1], user:'toto',ts: message.ts})
            }
        }
    });
