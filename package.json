@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Zeeml/agent#readme",
   "dependencies": {
+    "@slack/client": "^3.9.0",
     "colors": "^1.1.2",
     "express": "^4.15.2",
     "http": "0.0.0",
