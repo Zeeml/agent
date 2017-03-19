@@ -19,41 +19,66 @@ module.exports.setDatabase = function(db) {
     database = db;
 }
 
-module.exports.listChannels = function() {
-    var _this = this;
-    web.channels.list(function(err, info) {
-       if (err) {
-           console.log('Error:', err);
-       } else {
-           for(var i in info.channels) {
-               channels.push({id: info.channels[i].id, name: info.channels[i].name});
-               _this.channelHistory(info.channels[i].id);
-           }
-       }
+module.exports.load = function(callback) {
+    var bot = this;
+    bot.listUsers(function(err, data) {
+        if (err) {
+            process.stdout.write('Could not load list of users: ' + err);
+        }
+        users = data;
+        bot.listChannels(function(err, data) {
+            if (err) {
+                process.stdout.write('Could not load list of channels: ' + err);
+            } else {
+                channels = data;
+                for(var i in channels) {
+                    bot.channelHistory(channels[i].id, function(err, data) {
+                        if (!err) {
+                            database.schedule(data)
+                        }
+                    });
+                }
+            }
+        });
     });
 }
 
-module.exports.listUsers = function() {
+module.exports.listChannels = function(callback) {
+    var _this = this;
+    web.channels.list(function(err, info) {
+        var data = [];
+        if (!err) {
+            for(var i in info.channels) {
+                data.push({id: info.channels[i].id, name: info.channels[i].name});
+            }
+        }
+        callback(err, data);
+    });
+}
+
+module.exports.listUsers = function(callback) {
     web.users.list(function(err, info) {
-       if (err) {
-           console.log('Error:', err);
-       } else {
-           for(var i in info.members) {
-               users.push({id: info.members[i].id, name: info.members[i].name})
-           }
-       }
+        var data = [];
+        if (!err) {
+            for(var i in info.members) {
+                data.push({id: info.members[i].id, name: info.members[i].name})
+            }
+        }
+        callback(err, data)
     });
 }
 
 var i = 0;
-module.exports.channelHistory = function(channel) {
+module.exports.channelHistory = function(channel, callback) {
     web.channels.history(channel, function(err, info) {
-        for(var i in info.messages) {
-            if (typeof database !== "undefined" && typeof info.messages[i].text == "string") {
-                var result = info.messages[i].text.match(/\<(https?:\/\/.*)\>/);
-                if (result && typeof result[1] !== "undefined") {
-                    database.schedule({url:result[1], user:'toto',ts: info.messages[i].ts})
-                    console.log(result[1]);
+        if (!err) {
+            for(var i in info.messages) {
+                if (typeof database !== "undefined" && typeof info.messages[i].text == "string") {
+                    var result = info.messages[i].text.match(/\<(https?:\/\/.*)\>/);
+                    if (result && typeof result[1] !== "undefined") {
+                        var user = users.find(u => u.id === info.messages[i].user);
+                        callback(err, {url:result[1], user:user.name,ts: info.messages[i].ts})
+                    }
                 }
             }
         }

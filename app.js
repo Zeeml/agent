@@ -59,9 +59,9 @@ process.stdout.write('Loading Slack bot....');
 try {
     var slackBot = require('./slack/bot');
     slackBot.setDatabase(db);
-    slackBot.listChannels();
-    slackBot.listUsers();
-    slackBot.listen()
+    slackBot.load(function() {
+        slackBot.listen()
+    });
     process.stdout.write(colors.green('OK\n'));
 } catch (exception) {
     console.log(exception);
